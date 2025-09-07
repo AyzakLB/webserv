@@ -1,8 +1,13 @@
-#include "Parser.hpp"
+#include "Server.hpp"
 #include <sstream>
+#include <iostream>
+#include <stdexcept>
+#include <stdlib.h>
 
 
-Server::Server()
+//////////////////////////////////////////////////////////////////////// LOCATION //////////////////////////////////////////////////////////////////////
+
+Location::Location()
 {
     _index.push_back("index.html");
     _root = "html";
@@ -10,12 +15,54 @@ Server::Server()
     _allow_methods[1] = true;
     _allow_methods[2] = true;
     _autoindex = false;
+}
+
+void Location::addIndex(const std::string &path)
+{
+    _index.push_back(path);
+}
+
+void Location::setReturn(std::string code, std::string url)
+{
+    _return.push_back(code);
+    _return.push_back(url);
+}
+
+void Location::addCGI(std::string)
+{
+    // to be determined;
+}
+
+void Location::setRoot(const std::string &path)
+{
+    _root  = path;
+}
+void Location::setUploadPath(const std::string &path)
+{
+    _upload_path  = path;
+}
+
+void Location::setMethod(Method method, bool state)
+{
+    _allow_methods[method] = state;
+}
+
+void Location::setAutoIndex(bool state)
+{
+    _autoindex = state;
+}
+
+
+////////////////////////////////////////////////////////////////////////// SERVER //////////////////////////////////////////////////////////////////////
+
+Server::Server()
+{
     _client_max_body_size = 1000000;
 }
 
 
 /////////////////////////////////////////////////////////////////////////// SETTERS ////////////////////////////////////////////////////////////////////
-void Server::addLocation(const std::string &path, Server location)
+void Server::addLocation(const std::string &path, Location location)
 {
     try 
     {
@@ -65,45 +112,15 @@ void Server::addErrorPage(const std::string &error_code, const std::string &path
     _error_page[error_code] = path;
 }
 
-void Server::addIndex(const std::string &path)
-{
-    _index.push_back(path);
-}
-
-void Server::addCGI(std::string)
-{
-    // to be determined;
-}
-
-void Server::setRoot(const std::string &path)
-{
-    _root  = path;
-}
-void Server::setUploadPath(const std::string &path)
-{
-    _upload_path  = path;
-}
-
 void Server::setClientMaxBodySize(size_t size)
 {
     _client_max_body_size = size;
 }
 
-void Server::setMethod(Method method, bool state)
-{
-    _allow_methods[method] = state;
-}
-
-
-void Server::setAutoIndex(bool state)
-{
-    _autoindex = state;
-}
-
 
 /////////////////////////////////////////////////////////////////////////// GETTERS ////////////////////////////////////////////////////////////////////
 
-const Server &Server::getLocation(const std::string &path)
+const Location &Server::getLocation(const std::string &path)
 {
     try
     {
@@ -118,6 +135,9 @@ const Server &Server::getLocation(const std::string &path)
     } catch (const std::exception &e)
     {
         std::cout << e.what() << std::endl;
+        // This is problematic. What should be returned on error?
+        // For now, I'll re-throw, but this needs to be handled by the caller.
+        throw;
     }
 }
 
