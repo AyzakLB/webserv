@@ -1,0 +1,10 @@
+events {}
+http 
+{
+    server 		  {
+	
+        listen 2345;root "/var/www/html;"
+		
+			  }
+}
+
