@@ -4,6 +4,7 @@
 #include "Scanner.hpp"
 
 
+TokenType getStringTokenType(std::string string);
 bool isInCharset(char c, const char *charset);
 bool isLowerCase(std::string string);
 std::string toUpperCase(std::string string);
@@ -71,7 +72,7 @@ void Scanner::scanTokens()
                     return ;
                 }
         }
-        addToken(VALUE_STRING, lexeme);
+        addToken(getStringTokenType(lexeme), lexeme);
     }
 
     void Scanner::getString()
@@ -86,8 +87,8 @@ void Scanner::scanTokens()
             return;
         }
         advance();
-        std::string value = _source.substr(_start + 1, _current - _start - 2);
-        addToken(VALUE_STRING, value);
+        std::string lexeme = _source.substr(_start + 1, _current - _start - 2);
+        addToken(getStringTokenType(lexeme), lexeme);
     }
 
 bool Scanner::isAtEnd() 
@@ -149,4 +150,24 @@ std::string toUpperCase(std::string string)
         }
     }
     return string;
+}
+
+bool isNumber(std::string string)
+{
+    for (size_t i = 0; i < string.length(); i++) {
+        char c = string[i];
+        if (c < '0' || c > '9') {
+            return false;
+        }
+    }
+    return true;
+}
+
+TokenType getStringTokenType(std::string string)
+{
+    if (string[0] == '/')
+        return VALUE_PATH;
+    else if (isNumber(string))
+        return VALUE_NUMBER;
+    return VALUE_STRING;
 }

@@ -1,6 +1,6 @@
 CXX:= c++
 CXXFLAGS:= -Wall -Wextra -Werror -std=c++98
-CONFIGURATION_PARSER_SRCS:= configurationParser/Scanner.cpp configurationParser/Token.cpp
+CONFIGURATION_PARSER_SRCS:= configurationParser/Scanner.cpp configurationParser/Token.cpp 
 SRCS:=  main.cpp $(CONFIGURATION_PARSER_SRCS)
 
 OBJS:= $(SRCS:.cpp=.o) 

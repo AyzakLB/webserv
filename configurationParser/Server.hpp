@@ -59,7 +59,6 @@ class Server {
         void addErrorPage(const std::string &error_code, const std::string &path);
         void setClientMaxBodySize(size_t size);
 
-
         // GETTERS
         const Location &getLocation(const std::string &path);
         
