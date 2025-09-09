@@ -1,7 +1,11 @@
-#include "configurationParser/Scanner.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "CONFIGURATION_PARSER/Parser.hpp"
+#include "CONFIGURATION_PARSER/Scanner.hpp"
+
+
+
 
 int main(int argc, char* argv[]) {
     
@@ -23,9 +27,14 @@ int main(int argc, char* argv[]) {
 
     // Get the content from the stringstream
     std::string source = buffer.str();
-    Scanner lexicalAnalygator(source);
-    lexicalAnalygator.scanTokens();
-    lexicalAnalygator.printTokens();
+    try {
+        Parser parser(source);
+        std::vector<Server> servers  = parser.parse();
+
+    } catch (const ParsingException& e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
     file.close();
 
     return 0;

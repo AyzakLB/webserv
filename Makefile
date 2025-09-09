@@ -1,10 +1,13 @@
 CXX:= c++
 CXXFLAGS:= -Wall -Wextra -Werror -std=c++98
-CONFIGURATION_PARSER_SRCS:= configurationParser/Scanner.cpp configurationParser/Token.cpp 
+
 SRCS:=  main.cpp $(CONFIGURATION_PARSER_SRCS)
+HEADERS:=
+include CONFIGURATION_PARSER/config.mk
+include EXCEPTIONS/exceptions.mk
+include UTILITIES/utilities.mk
 
 OBJS:= $(SRCS:.cpp=.o) 
-HEADERS:= 
 RM:= rm -f
 NAME:= webserv
 

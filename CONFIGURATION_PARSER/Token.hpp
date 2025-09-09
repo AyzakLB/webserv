@@ -28,7 +28,7 @@ enum TokenType {
     AUTOINDEX,
     
     //HTTP Method Control
-    ALLOW_METHODS,
+    ALLOW_METHODS, GET, POST, DELETE,
     
     // Redirections
     RETURN,
@@ -50,17 +50,16 @@ enum TokenType {
 };
 
 std::map<std::string, int> createStringToTokenMap();
-
-std::map<int, std::string> createTokenToStringMap();
+std::map<int, std::string> createTokenToStringMap();    
 
 extern std::map<int, std::string> tokenToString;
 extern std::map<std::string, int> stringToToken;
 
 class Token {
     public:
-    const TokenType _type;
-    const std::string _lexeme;
-    const int _line;
+    TokenType _type;
+    std::string _lexeme;
+    int _line;
     Token(TokenType type, std::string lexeme, size_t line) : _type(type), _lexeme(lexeme), _line(line){};
     void printToken();
 

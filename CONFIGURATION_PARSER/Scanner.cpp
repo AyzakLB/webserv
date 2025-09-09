@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include "Token.hpp"
 #include "Scanner.hpp"
 
 
@@ -20,8 +19,8 @@ Scanner::Scanner(std::string source) : _source(source)
 
 void Scanner::printTokens()
 {
-        for (size_t i = 0; i < _tokenCount; i++)
-                _tokens[i].printToken();
+    for (size_t i = 0; i < _tokenCount; i++)
+        _tokens[i].printToken();
 }
 
 void Scanner::scanTokens() 
@@ -71,6 +70,10 @@ void Scanner::scanTokens()
                     addToken(static_cast<TokenType>(stringToToken.find(upperLexeme)->second));
                     return ;
                 }
+        } else if (stringToToken.find(lexeme) != stringToToken.end())
+        {
+            addToken(static_cast<TokenType>(stringToToken.find(lexeme)->second));
+            return ;
         }
         addToken(getStringTokenType(lexeme), lexeme);
     }
@@ -120,6 +123,12 @@ char Scanner::advance()
             return '\0';
         return _source[_current];
     }
+
+/////////////////////////////////////// getters ////////////////////////////////////
+const std::vector<Token> &Scanner::getTokens() const 
+{ 
+    return _tokens; 
+};
 
 ////////////////////////////////////// HELPERS ////////////////////////////////////
 bool isInCharset(char c, const char *charset)

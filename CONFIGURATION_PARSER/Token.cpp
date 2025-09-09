@@ -11,6 +11,9 @@ std::map<std::string, int> createStringToTokenMap() {
     m["INDEX"] = INDEX;
     m["AUTOINDEX"] = AUTOINDEX;
     m["ALLOW_METHODS"] = ALLOW_METHODS;
+    m["GET"] = GET;
+    m["POST"] = POST;
+    m["DELETE"] = DELETE;
     m["RETURN"] = RETURN;
     m["UPLOAD_PATH"] = UPLOAD_PATH;
     m["CGI"] = CGI;
@@ -34,6 +37,9 @@ std::map<int, std::string> createTokenToStringMap() {
     m[ROOT] = "ROOT";
     m[INDEX] = "INDEX";
     m[AUTOINDEX] = "AUTOINDEX";
+    m[GET] = "GET";
+    m[POST] = "POST";
+    m[DELETE] = "DELETE";
     m[ALLOW_METHODS] = "ALLOW_METHODS";
     m[RETURN] = "RETURN";
     m[UPLOAD_PATH] = "UPLOAD_PATH";

@@ -3,17 +3,20 @@
 #include "Token.hpp"
 #include "Scanner.hpp"
 #include "Server.hpp"
-
+#include "../EXCEPTIONS/ParsingException.hpp"
+#include "../UTILITIES/Header.hpp"
+#include <string>
 
 class Parser {
+    std::vector<Token> _tokens;
     size_t  _current;
     public:
-        Parser() : _current(0){};
+        Parser(std::string source);
         std::vector<Server> parse();
 
         // main stuff
-        const Server &parseServerBlock();
-        const Location &Parser::parseLocation(Server server);
+        void parseServerBlock(Server &server);
+        void parseLocation(Server &server);
         void parseListen(Server &server);
         void parseErrorPage(Server &server);
         void parseClientMaxBodySize(Server &server);
@@ -29,5 +32,6 @@ class Parser {
         Token peek();
         Token advance();
         bool isAtEnd();
-        void consume(TokenType type, std::string message);
-}
+        Token consume(TokenType type, std::string message);
+        void syntaxCheck(TokenType expecteddToken, std::string error);
+};

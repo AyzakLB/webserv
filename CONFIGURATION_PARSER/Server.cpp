@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include <sstream>
 #include <iostream>
 #include <stdexcept>
 #include <stdlib.h>
@@ -17,6 +16,11 @@ Location::Location()
     _autoindex = false;
 }
 
+void Server::pushBackLocation(const std::string &path, Location location)
+{
+    _locations[path] = location;
+}
+
 void Location::addIndex(const std::string &path)
 {
     _index.push_back(path);
@@ -28,9 +32,9 @@ void Location::setReturn(std::string code, std::string url)
     _return.push_back(url);
 }
 
-void Location::addCGI(std::string)
+void Location::addCGI(std::string extension, std::string path)
 {
-    // to be determined;
+    _CGI[extension] = path;
 }
 
 void Location::setRoot(const std::string &path)
@@ -42,7 +46,7 @@ void Location::setUploadPath(const std::string &path)
     _upload_path  = path;
 }
 
-void Location::setMethod(Method method, bool state)
+void Location::setMethod(TokenType method, bool state)
 {
     _allow_methods[method] = state;
 }
@@ -64,12 +68,12 @@ Server::Server()
 /////////////////////////////////////////////////////////////////////////// SETTERS ////////////////////////////////////////////////////////////////////
 void Server::addLocation(const std::string &path, Location location)
 {
-    try 
+    try
     {
         if (_locations.find(path) == _locations.end())
             _locations[path] = location;
         else
-            throw std::runtime_error("location block already exists");
+            throw std::runtime_error("a location block with the path '" + path + "' already exists");
     } catch (std::exception &e)
     {
         std::cout << e.what() << std::endl;
@@ -77,33 +81,9 @@ void Server::addLocation(const std::string &path, Location location)
     }
 }
 
-
-std::vector<std::string> split(std::string string, char delimiter)
+void Server::addConnection(const std::string &address, const std::string &port)
 {
-    std::vector<std::string> result;
-    std::string temp;
-    std::stringstream ss(string);
-    while (std::getline(ss, temp, delimiter))
-    {
-        result.push_back(temp);
-    }
-    return result;
-}
-void Server::addConnection(const std::string &addport)
-{
-    try
-    {
-        std::vector<std::string> parts = split(addport, ':');
-        if (parts.size() != 2)
-            throw std::runtime_error("invalid address:port pair!");
-        std::string hostname = parts[0];
-        std::string port = parts[1];
-        _listen.push_back(Connection(hostname, port));
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
+   _listen.push_back(Connection(address, port));
 }
 
 

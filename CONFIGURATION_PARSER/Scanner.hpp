@@ -2,10 +2,9 @@
 
 #include <iostream>
 #include <vector>
-#include "./Token.hpp"
+#include "Token.hpp"
 
 class Scanner {
-
     const std::string _source;
     std::vector<Token> _tokens;
     size_t _count;
@@ -15,6 +14,7 @@ class Scanner {
     size_t _line;
     public:
         Scanner(std::string source);
+        const std::vector<Token> &getTokens() const;
         void printTokens();
         void scanTokens();
         void scanToken();
@@ -25,7 +25,4 @@ class Scanner {
         bool isAtEnd();
         char advance();
         char peek();
-    // Helpers
-
-    
 };
