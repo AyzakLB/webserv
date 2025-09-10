@@ -14,9 +14,9 @@ Parser::Parser(std::string source)
 std::vector<Server> Parser::parse()
 {
     std::vector<Server> servers;
-
     while (_tokens[_current]._type != EOF_TOKEN && _current < _tokens.size() - 1)
     {
+        std::cout << "Parse at line " << peek()._line << " current token is " << peek()._lexeme << std::endl;
         if (peek()._type == SERVER)
         {
             Server server;
@@ -36,6 +36,7 @@ void Parser::parseServerBlock(Server &server)
     consume(BRACKET_LEFT, "expected a '{' before server block");
     while (peek()._type != BRACKET_RIGHT && peek()._type != EOF_TOKEN)
     {
+        std::cout << "parseServerBlock at line " << peek()._line << " current token is " << peek()._lexeme << std::endl;
         if (peek()._type == LISTEN)
             parseListen(server);
         else if (peek()._type == ERROR_PAGE)
@@ -45,39 +46,56 @@ void Parser::parseServerBlock(Server &server)
         else if (peek()._type == LOCATION)
             parseLocation(server);
         else
-        {
-            throw ParsingException(peek(), "unexpected token in server block");
-        }
+            parseDefaultLocation(server);
     }
     consume(BRACKET_RIGHT, "expected a '}' to close server block");
 }
-
+ 
+void Parser::parseDefaultLocation(Server &server)
+{
+    std::cout << "parsed default location, current token " << peek()._lexeme << std::endl;
+        if (peek()._type == ALLOW_METHODS)
+            parseAllowMethods(server.getDefaultLocation());
+        else if (peek()._type == RETURN)
+            parseReturn(server.getDefaultLocation());
+        else if (peek()._type == INDEX)
+            parseIndex(server.getDefaultLocation());
+        else if (peek()._type == ROOT)
+            parseRoot(server.getDefaultLocation());
+        else if (peek()._type == AUTOINDEX)
+            parseAutoIndex(server.getDefaultLocation());
+        else if (peek()._type == UPLOAD_PATH)
+            parseUploadPath(server.getDefaultLocation());
+        else if (peek()._type == CGI)
+            parseCGI(server.getDefaultLocation());
+        else
+            throw ParsingException(peek(), "unexpected token in server blockkk");
+}
 void Parser::parseLocation(Server &server)
 {
     Location location;
     consume(LOCATION, "expected a location");
     Token path = consume(VALUE_PATH, "expected a path after location");
-    consume(BRACKET_LEFT, "expected a '{' before location block");   
+    consume(BRACKET_LEFT, "expected a '{' before location block");
     while (peek()._type != BRACKET_RIGHT && peek()._type != EOF_TOKEN)
     {
+        std::cout << "parseLocation at line " << peek()._line << " current token is " << peek()._lexeme << std::endl;
         if (peek()._type == ALLOW_METHODS)
             parseAllowMethods(location);
-        if (peek()._type == RETURN)
+        else if (peek()._type == RETURN)
             parseReturn(location);
-        if (peek()._type == INDEX)
+        else if (peek()._type == INDEX)
             parseIndex(location);
-        if (peek()._type == ROOT)
+        else if (peek()._type == ROOT)
             parseRoot(location);
-        if (peek()._type == AUTOINDEX)
+        else if (peek()._type == AUTOINDEX)
             parseAutoIndex(location);
-        if (peek()._type == UPLOAD_PATH)
+        else if (peek()._type == UPLOAD_PATH)
             parseUploadPath(location);
-        if (peek()._type == CGI)
+        else if (peek()._type == CGI)
             parseCGI(location);
         else
-        {
-            // handle syntax error later;
-        }
+            throw ParsingException(peek(), "unexpected token in location block");
     }
     consume(BRACKET_RIGHT, "expected a '}' to close location block");
     server.addLocation(path._lexeme, location);
@@ -101,8 +119,23 @@ void Parser::parseListen(Server &server)
 void Parser::parseErrorPage(Server &server)
 {
     consume(ERROR_PAGE, "expected an 'error_page' directive");
-    (void) server;
-    
+    char *end;
+    size_t code;
+    std::string path;
+    std::vector<std::string> error_codes;
+    while (peek()._type == VALUE_NUMBER)
+        error_codes.push_back(advance()._lexeme);
+    if (peek()._type != VALUE_PATH)
+        throw ParsingException(peek(), "expected a path after error codes");
+    path = advance()._lexeme;
+    for (size_t i = 0; i < error_codes.size(); i++)
+    {
+        code = strtoul(error_codes[i].c_str(), &end,10);
+        if ( code < 300 || code > 599)
+            throw ParsingException(peek(), "error code must be between 300 and 599");
+        server.addErrorPage(error_codes[i], path);
+    }
+    consume(SEMICOLON, "expected a ';' after error_page directive");
 }
 
 size_t parseBodySize(std::string size, Token token);
@@ -122,10 +155,11 @@ void Parser::parseAllowMethods(Location &location)
     consume(ALLOW_METHODS, "expected an 'allow_methods' directive");
     if (peek()._type != GET && peek()._type != POST && peek()._type != DELETE)
         throw ParsingException(peek(), "invalid method in allow_methods directive");
-    for (size_t i = 0; i < 3; i++)
-        location.setMethod(static_cast<TokenType>(i - GET), false);
+    location.setMethod(GET, false);
+    location.setMethod(POST, false);
+    location.setMethod(DELETE, false);
     while (peek()._type == GET || peek()._type == POST || peek()._type == DELETE)
-        location.setMethod(peek()._type, true);
+        location.setMethod(advance()._type, true);
     consume(SEMICOLON, "expected a ';' after allow_methods directive");
 }
 void Parser::parseReturn(Location &location)

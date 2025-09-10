@@ -16,6 +16,7 @@ Location::Location()
     _autoindex = false;
 }
 
+//////////////////////////////////////////////////////////////////////// SETTERS //////////////////////////////////////////////////////////////////////
 void Server::pushBackLocation(const std::string &path, Location location)
 {
     _locations[path] = location;
@@ -48,7 +49,7 @@ void Location::setUploadPath(const std::string &path)
 
 void Location::setMethod(TokenType method, bool state)
 {
-    _allow_methods[method] = state;
+        _allow_methods[method - GET] = state;
 }
 
 void Location::setAutoIndex(bool state)
@@ -56,6 +57,42 @@ void Location::setAutoIndex(bool state)
     _autoindex = state;
 }
 
+//////////////////////////////////////////////////////////////////////// GETTERS ////////////////////////////////////////////////////////////////////
+
+ bool Location::getMethod(TokenType method) const
+{
+    return _allow_methods[method - GET];
+}
+
+const std::vector<std::string> &Location::getReturn() const
+{
+    return _return;
+}
+
+const std::string &Location::getRoot() const
+{
+    return _root;
+}
+
+const std::vector<std::string> &Location::getIndex() const
+{
+    return _index;
+}
+
+const bool &Location::getAutoIndex() const
+{
+    return _autoindex;
+}
+
+const std::string &Location::getUploadPath() const
+{
+    return _upload_path;
+}
+
+const std::map<std::string, std::string> &Location::getCGI() const
+{
+    return _CGI;
+}
 
 ////////////////////////////////////////////////////////////////////////// SERVER //////////////////////////////////////////////////////////////////////
 
@@ -68,13 +105,14 @@ Server::Server()
 /////////////////////////////////////////////////////////////////////////// SETTERS ////////////////////////////////////////////////////////////////////
 void Server::addLocation(const std::string &path, Location location)
 {
+    std::cout << "trying to add location with path " << path << std::endl;
     try
     {
         if (_locations.find(path) == _locations.end())
             _locations[path] = location;
         else
             throw std::runtime_error("a location block with the path '" + path + "' already exists");
-    } catch (std::exception &e)
+    } catch (std::runtime_error &e)
     {
         std::cout << e.what() << std::endl;
         exit(EXIT_FAILURE);
@@ -100,7 +138,28 @@ void Server::setClientMaxBodySize(size_t size)
 
 /////////////////////////////////////////////////////////////////////////// GETTERS ////////////////////////////////////////////////////////////////////
 
-const Location &Server::getLocation(const std::string &path)
+const std::vector<Connection> &Server::getConnections() const
+{
+    return _listen;
+}
+
+const std::map<std::string, std::string> &Server::getErrorPages() const
+{
+    return _error_page;
+}
+
+const size_t &Server::getClientMaxBodySize() const
+{
+    return _client_max_body_size;
+}
+
+const std::map<std::string, Location> &Server::getLocations() const
+{
+    return _locations;
+}
+
+
+const Location &Server::getLocation(const std::string &path) const
 {
     try
     {
@@ -108,7 +167,7 @@ const Location &Server::getLocation(const std::string &path)
         while (current_path.empty() == 0)
         {
             if (_locations.find(current_path) != _locations.end())
-                return _locations.find(current_path)->second;
+            return _locations.find(current_path)->second;
             current_path = current_path.substr(0, current_path.find_last_of('/'));
         }
         throw std::runtime_error("no matching block for the requested path");
@@ -121,4 +180,7 @@ const Location &Server::getLocation(const std::string &path)
     }
 }
 
-
+Location &Server::getDefaultLocation()
+{
+    return _default_location;
+}

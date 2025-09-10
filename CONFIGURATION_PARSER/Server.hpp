@@ -41,14 +41,21 @@ public:
     void addCGI(std::string extension, std::string path);
 
     // GETTERS 
-    const std::string& getRoot() const { return _root; }
+    bool getMethod(TokenType method) const;
+    const std::vector<std::string> &getReturn() const;
+    const std::string& getRoot() const;
+    const std::vector<std::string> &getIndex() const;
+    const bool &getAutoIndex() const;
+    const std::string &getUploadPath() const;
+    const std::map<std::string, std::string> &getCGI() const;
 };
 
 class Server {
     std::vector<Connection>             _listen; // https://nginx.org/en/docs/http/ngx_http_core_module.html#listen
     std::map<std::string, std::string>  _error_page; // subject to change, https://nginx.org/en/docs/http/ngx_http_core_module.html#error_page
     size_t                              _client_max_body_size; // https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
-    std::map<std::string, Location>     _locations; 
+    std::map<std::string, Location>     _locations;
+    Location                           _default_location; // gotta find a better way to handle this
 
     public:
         Server();
@@ -59,7 +66,12 @@ class Server {
         void addErrorPage(const std::string &error_code, const std::string &path);
         void setClientMaxBodySize(size_t size);
         void pushBackLocation(const std::string &path, Location location);
-        // GETTERS
-        const Location &getLocation(const std::string &path);
         
+        // GETTERS
+        const std::vector<Connection> &getConnections() const;
+        const std::map<std::string, std::string> &getErrorPages() const;
+        const size_t &getClientMaxBodySize() const;
+        const std::map<std::string, Location> &getLocations() const;
+        const Location &getLocation(const std::string &path) const;
+        Location &getDefaultLocation();
 };

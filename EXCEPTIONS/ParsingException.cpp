@@ -4,7 +4,7 @@ ParsingException::ParsingException(Token token, std::string error)
 {
     std::ostringstream ss;
     std::string tokenString;
-    if (token._type != EOF_TOKEN)
+    if (token._type == EOF_TOKEN)
         tokenString = "EOF";
     else
         tokenString = token._lexeme;
