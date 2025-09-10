@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Scanner.hpp"
 #include <set>
 #include <map>
@@ -14,6 +16,7 @@ class Connection {
 };
 
 class Location {
+    std::string                         _path;
     std::map<std::string, std::string>  _error_page; // subject to change, https://nginx.org/en/docs/http/ngx_http_core_module.html#error_page
     size_t                              _client_max_body_size; // https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
     bool                                _allow_methods[3]; 
@@ -28,6 +31,7 @@ public:
     Location();
 
     // SETTERS
+    void setPath(const std::string &path);
     void addErrorPage(const std::string &error_code, const std::string &path);
     void setClientMaxBodySize(size_t size);
     void setMethod(TokenType method, bool state);
@@ -39,6 +43,7 @@ public:
     void addCGI(std::string extension, std::string path);
 
     // GETTERS 
+    const std::string &getPath() const;
     const std::map<std::string, std::string> &getErrorPages() const;
     const size_t &getClientMaxBodySize() const;
     bool getMethod(TokenType method) const;

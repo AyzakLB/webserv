@@ -73,6 +73,7 @@ void Parser::parseLocation(Server &server)
     Location location;
     consume(LOCATION, "expected a location");
     Token path = consume(VALUE_PATH, "expected a path after location");
+    location.setPath(path._lexeme);
     consume(BRACKET_LEFT, "expected a '{' before location block");
     while (peek()._type != BRACKET_RIGHT && peek()._type != EOF_TOKEN)
     {
