@@ -4,12 +4,6 @@
 #include <vector>
 #include <string>
 
-// enum Method {
-//     GET,
-//     POST,
-//     DELETE,
-// };
-
 class Connection {
     std::string _address;
     std::string  _port;
@@ -20,6 +14,8 @@ class Connection {
 };
 
 class Location {
+    std::map<std::string, std::string>  _error_page; // subject to change, https://nginx.org/en/docs/http/ngx_http_core_module.html#error_page
+    size_t                              _client_max_body_size; // https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
     bool                                _allow_methods[3]; 
     std::vector<std::string>            _return; // https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#return
     std::string                         _root; // https://nginx.org/en/docs/http/ngx_http_core_module.html#root
@@ -32,6 +28,8 @@ public:
     Location();
 
     // SETTERS
+    void addErrorPage(const std::string &error_code, const std::string &path);
+    void setClientMaxBodySize(size_t size);
     void setMethod(TokenType method, bool state);
     void setReturn(std::string code, std::string url);
     void setRoot(const std::string &path);
@@ -41,6 +39,8 @@ public:
     void addCGI(std::string extension, std::string path);
 
     // GETTERS 
+    const std::map<std::string, std::string> &getErrorPages() const;
+    const size_t &getClientMaxBodySize() const;
     bool getMethod(TokenType method) const;
     const std::vector<std::string> &getReturn() const;
     const std::string& getRoot() const;
@@ -52,10 +52,8 @@ public:
 
 class Server {
     std::vector<Connection>             _listen; // https://nginx.org/en/docs/http/ngx_http_core_module.html#listen
-    std::map<std::string, std::string>  _error_page; // subject to change, https://nginx.org/en/docs/http/ngx_http_core_module.html#error_page
-    size_t                              _client_max_body_size; // https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
     std::map<std::string, Location>     _locations;
-    Location                           _default_location; // gotta find a better way to handle this
+    Location                           _default_location; // gotta
 
     public:
         Server();
@@ -63,14 +61,10 @@ class Server {
         // SETTERS
         void addLocation(const std::string &path, Location location);
         void addConnection(const std::string &address, const std::string &port);
-        void addErrorPage(const std::string &error_code, const std::string &path);
-        void setClientMaxBodySize(size_t size);
         void pushBackLocation(const std::string &path, Location location);
         
         // GETTERS
         const std::vector<Connection> &getConnections() const;
-        const std::map<std::string, std::string> &getErrorPages() const;
-        const size_t &getClientMaxBodySize() const;
         const std::map<std::string, Location> &getLocations() const;
         const Location &getLocation(const std::string &path) const;
         Location &getDefaultLocation();

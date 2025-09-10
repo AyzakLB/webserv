@@ -17,6 +17,17 @@ Location::Location()
 }
 
 //////////////////////////////////////////////////////////////////////// SETTERS //////////////////////////////////////////////////////////////////////
+
+void Location::addErrorPage(const std::string &error_code, const std::string &path)
+{
+    _error_page[error_code] = path;
+}
+
+void Location::setClientMaxBodySize(size_t size)
+{
+    _client_max_body_size = size;
+}
+
 void Server::pushBackLocation(const std::string &path, Location location)
 {
     _locations[path] = location;
@@ -59,6 +70,16 @@ void Location::setAutoIndex(bool state)
 
 //////////////////////////////////////////////////////////////////////// GETTERS ////////////////////////////////////////////////////////////////////
 
+const std::map<std::string, std::string> &Location::getErrorPages() const
+{
+    return _error_page;
+}
+
+const size_t &Location::getClientMaxBodySize() const
+{
+    return _client_max_body_size;
+}
+
  bool Location::getMethod(TokenType method) const
 {
     return _allow_methods[method - GET];
@@ -96,16 +117,11 @@ const std::map<std::string, std::string> &Location::getCGI() const
 
 ////////////////////////////////////////////////////////////////////////// SERVER //////////////////////////////////////////////////////////////////////
 
-Server::Server()
-{
-    _client_max_body_size = 1000000;
-}
-
+Server::Server(){}
 
 /////////////////////////////////////////////////////////////////////////// SETTERS ////////////////////////////////////////////////////////////////////
 void Server::addLocation(const std::string &path, Location location)
 {
-    std::cout << "trying to add location with path " << path << std::endl;
     try
     {
         if (_locations.find(path) == _locations.end())
@@ -125,15 +141,7 @@ void Server::addConnection(const std::string &address, const std::string &port)
 }
 
 
-void Server::addErrorPage(const std::string &error_code, const std::string &path)
-{
-    _error_page[error_code] = path;
-}
 
-void Server::setClientMaxBodySize(size_t size)
-{
-    _client_max_body_size = size;
-}
 
 
 /////////////////////////////////////////////////////////////////////////// GETTERS ////////////////////////////////////////////////////////////////////
@@ -141,16 +149,6 @@ void Server::setClientMaxBodySize(size_t size)
 const std::vector<Connection> &Server::getConnections() const
 {
     return _listen;
-}
-
-const std::map<std::string, std::string> &Server::getErrorPages() const
-{
-    return _error_page;
-}
-
-const size_t &Server::getClientMaxBodySize() const
-{
-    return _client_max_body_size;
 }
 
 const std::map<std::string, Location> &Server::getLocations() const

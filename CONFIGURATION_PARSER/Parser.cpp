@@ -16,7 +16,6 @@ std::vector<Server> Parser::parse()
     std::vector<Server> servers;
     while (_tokens[_current]._type != EOF_TOKEN && _current < _tokens.size() - 1)
     {
-        std::cout << "Parse at line " << peek()._line << " current token is " << peek()._lexeme << std::endl;
         if (peek()._type == SERVER)
         {
             Server server;
@@ -36,13 +35,8 @@ void Parser::parseServerBlock(Server &server)
     consume(BRACKET_LEFT, "expected a '{' before server block");
     while (peek()._type != BRACKET_RIGHT && peek()._type != EOF_TOKEN)
     {
-        std::cout << "parseServerBlock at line " << peek()._line << " current token is " << peek()._lexeme << std::endl;
         if (peek()._type == LISTEN)
             parseListen(server);
-        else if (peek()._type == ERROR_PAGE)
-            parseErrorPage(server);
-        else if (peek()._type == CLIENT_MAX_BODY_SIZE)
-            parseClientMaxBodySize(server);
         else if (peek()._type == LOCATION)
             parseLocation(server);
         else
@@ -53,8 +47,11 @@ void Parser::parseServerBlock(Server &server)
  
 void Parser::parseDefaultLocation(Server &server)
 {
-    std::cout << "parsed default location, current token " << peek()._lexeme << std::endl;
-        if (peek()._type == ALLOW_METHODS)
+        if (peek()._type == ERROR_PAGE)
+            parseErrorPage(server.getDefaultLocation());
+        else if (peek()._type == CLIENT_MAX_BODY_SIZE)
+            parseClientMaxBodySize(server.getDefaultLocation());
+        else if (peek()._type == ALLOW_METHODS)
             parseAllowMethods(server.getDefaultLocation());
         else if (peek()._type == RETURN)
             parseReturn(server.getDefaultLocation());
@@ -79,8 +76,13 @@ void Parser::parseLocation(Server &server)
     consume(BRACKET_LEFT, "expected a '{' before location block");
     while (peek()._type != BRACKET_RIGHT && peek()._type != EOF_TOKEN)
     {
-        std::cout << "parseLocation at line " << peek()._line << " current token is " << peek()._lexeme << std::endl;
-        if (peek()._type == ALLOW_METHODS)
+        if (peek()._type == ERROR_PAGE)
+            parseErrorPage(location);
+        else if (peek()._type == CLIENT_MAX_BODY_SIZE)
+            parseClientMaxBodySize(location);
+        else if (peek()._type == CLIENT_MAX_BODY_SIZE)
+            parseClientMaxBodySize(location);
+        else if (peek()._type == ALLOW_METHODS)
             parseAllowMethods(location);
         else if (peek()._type == RETURN)
             parseReturn(location);
@@ -116,7 +118,7 @@ void Parser::parseListen(Server &server)
 }
 
 
-void Parser::parseErrorPage(Server &server)
+void Parser::parseErrorPage(Location &location)
 {
     consume(ERROR_PAGE, "expected an 'error_page' directive");
     char *end;
@@ -133,18 +135,18 @@ void Parser::parseErrorPage(Server &server)
         code = strtoul(error_codes[i].c_str(), &end,10);
         if ( code < 300 || code > 599)
             throw ParsingException(peek(), "error code must be between 300 and 599");
-        server.addErrorPage(error_codes[i], path);
+        location.addErrorPage(error_codes[i], path);
     }
     consume(SEMICOLON, "expected a ';' after error_page directive");
 }
 
 size_t parseBodySize(std::string size, Token token);
-void Parser::parseClientMaxBodySize(Server &server)
+void Parser::parseClientMaxBodySize(Location &location)
 {
     consume(CLIENT_MAX_BODY_SIZE, "expected a 'client_max_body_size' directive");
     if (peek()._type != VALUE_NUMBER && peek()._type != VALUE_STRING)
         throw ParsingException(peek(), "invalid value for client_max_body_size");
-    server.setClientMaxBodySize(parseBodySize(peek()._lexeme, peek()));
+    location.setClientMaxBodySize(parseBodySize(peek()._lexeme, peek()));
     advance();
     consume(SEMICOLON, "expected a ';' after client_max_body_size directive");
 }
@@ -165,13 +167,13 @@ void Parser::parseAllowMethods(Location &location)
 void Parser::parseReturn(Location &location)
 {
     consume(RETURN, "expected a 'return' directive");
-    if (peek()._type != VALUE_NUMBER || peek()._type != VALUE_PATH)
-        throw ParsingException(peek(), "invalid return value");
+    if (peek()._type != VALUE_NUMBER && peek()._type != VALUE_PATH)
+        throw ParsingException(peek(), "invalid return value 1");
     if (peek()._type == VALUE_NUMBER)
     {
         std::string code = advance()._lexeme;
         if (peek()._type != VALUE_PATH && peek()._type != VALUE_STRING)
-            throw ParsingException(peek(), "invalid return value");
+            throw ParsingException(peek(), "invalid return value 2 ");
         location.setReturn(code, advance()._lexeme);
     } else
         location.setReturn("", advance()._lexeme);

@@ -19,8 +19,8 @@ class Parser {
         void parseLocation(Server &server);
         void parseDefaultLocation(Server &server);
         void parseListen(Server &server);
-        void parseErrorPage(Server &server);
-        void parseClientMaxBodySize(Server &server);
+        void parseErrorPage(Location &location);
+        void parseClientMaxBodySize(Location &location);
         void parseAllowMethods(Location &location);
         void parseReturn(Location &location);
         void parseIndex(Location &location);
