@@ -3,6 +3,7 @@
 #include <iostream>
 #include "CONFIGURATION_PARSER/Parser.hpp"
 #include "CONFIGURATION_PARSER/Scanner.hpp"
+#include "SERVER/Webserv.hpp"
 
 void printLocation(const Location& location, bool isDefault)
 {
@@ -86,8 +87,9 @@ int main(int argc, char* argv[]) {
         Parser parser(source);
         std::vector<Server> servers  = parser.parse();
         printServers(servers);
-
-    } catch (const ParsingException& e) {
+        Webserv webserv(servers);
+        webserv.start();
+    } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;
     }

@@ -1,2 +1,2 @@
-SRCS += EXCEPTIONS/ParsingException.cpp
-HEADERS += EXCEPTIONS/ParsingException.hpp
+SRCS += EXCEPTIONS/ParsingException.cpp EXCEPTIONS/NetworkException.cpp
+HEADERS += EXCEPTIONS/ParsingException.hpp EXCEPTIONS/NetworkException.hpp

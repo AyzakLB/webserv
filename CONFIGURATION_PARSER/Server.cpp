@@ -140,9 +140,9 @@ void Server::addLocation(const std::string &path, Location location)
         throw std::runtime_error("a location block with the path '" + path + "' already exists");
 }
 
-void Server::addConnection(const std::string &address, const std::string &port)
+void Server::addConnection(const std::string &address, const std::string &port, const Server &server)
 {
-   _listen.push_back(Connection(address, port));
+   _listen.push_back(Connection(address, port, server));
 }
 
 

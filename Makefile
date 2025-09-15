@@ -6,6 +6,7 @@ HEADERS:=
 include CONFIGURATION_PARSER/config.mk
 include EXCEPTIONS/exceptions.mk
 include UTILITIES/utilities.mk
+include SERVER/server.mk
 
 OBJS:= $(SRCS:.cpp=.o) 
 RM:= rm -f

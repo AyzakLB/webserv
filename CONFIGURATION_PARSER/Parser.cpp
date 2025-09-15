@@ -108,13 +108,12 @@ void Parser::parseLocation(Server &server)
 void Parser::parseListen(Server &server) 
 {
         consume(LISTEN, "expected a 'listen' directive");
-        syntaxCheck(VALUE_STRING, "unexpected value for listen");
-        std::vector<std::string> parts = split(advance()._lexeme, ':');
-        if (parts.size() != 2)
-            throw ParsingException(peek(), "invalid address:port pair!");
-        std::string address = parts[0];
-        std::string port = parts[1];
-        server.addConnection(address, port);
+        syntaxCheck(VALUE_STRING, "unexpected value for the address in listen");
+        std::string address = advance()._lexeme;
+        syntaxCheck(VALUE_NUMBER, "unexpected value for the port in listen");
+        std::string port = advance()._lexeme;
+
+        server.addConnection(address, port, server);
         consume(SEMICOLON, "expected a ';' after listen directive");
 }
 
