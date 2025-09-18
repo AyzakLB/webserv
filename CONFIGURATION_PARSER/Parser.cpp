@@ -113,7 +113,7 @@ void Parser::parseListen(Server &server)
         syntaxCheck(VALUE_NUMBER, "unexpected value for the port in listen");
         std::string port = advance()._lexeme;
 
-        server.addConnection(address, port, server);
+        server.addConnection(address, port);
         consume(SEMICOLON, "expected a ';' after listen directive");
 }
 

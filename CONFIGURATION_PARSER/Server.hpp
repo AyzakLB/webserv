@@ -9,9 +9,9 @@ class Server;
 class Connection {
     std::string _address;
     std::string  _port;
-    const Server &server;
+    // const Server &server;
     public:
-        Connection(const std::string &address, const std::string &port, const Server &server) : _address(address), _port(port), server(server) {};
+        Connection(const std::string &address, const std::string &port) : _address(address), _port(port){};
         const std::string &getAddress() const { return _address;}
         const std::string &getPort() const { return _port;} 
 };
@@ -66,7 +66,7 @@ class Server {
 
         // SETTERS
         void addLocation(const std::string &path, Location location);
-        void addConnection(const std::string &address, const std::string &port, const Server &server);
+        void addConnection(const std::string &address, const std::string &port);
         void pushBackLocation(const std::string &path, Location location);
         
         // GETTERS
