@@ -17,9 +17,10 @@ class Client {
         const Server &getServer() const;
         std::string &getRequest();
         const size_t &getBytesSent() ;
+        const std::string &getResponse() const;
 
         // SETTERS
         void setRequest(const std::string &request);
         void setBytesSent(size_t sent);
-        const std::string &getResponse() const;
+        void setResponse(const std::string &response);
 };

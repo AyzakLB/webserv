@@ -1,25 +1,21 @@
 #include "Parser.hpp"
 #include <cstdlib>
 
-Parser::Parser(std::string source)
-{
-    _current = 0;
-    Scanner scanner(source);
-    scanner.scanTokens();
-    scanner.printTokens();
-    _tokens = scanner.getTokens();
-}
-/////////////////////////////////////////////// MAIN PARSING LOGIC ////////////////////////////////////////////////////////j
+Parser::Parser(std::string source) : _source(source), _current(0) {}
+/////////////////////////////////////////////// MAIN PARSING LOGIC ////////////////////////////////////////////////////////
 
 std::vector<Server> Parser::parse()
 {
     std::vector<Server> servers;
+    Scanner scanner(_source);
+    scanner.scanTokens();
+    // scanner.printTokens();
+    _tokens = scanner.getTokens();
     while (_tokens[_current]._type != EOF_TOKEN && _current < _tokens.size() - 1)
     {
         if (peek()._type == SERVER)
         {
             Server server;
-            // Server &rserv = server;
             parseServerBlock(server);
             servers.push_back(server);
         }

@@ -8,6 +8,7 @@
 #include <string>
 
 class Parser {
+    std::string _source;
     std::vector<Token> _tokens;
     size_t  _current;
     public:
@@ -30,6 +31,7 @@ class Parser {
         void parseCGI(Location &location);
 
         // Helpers
+        
         Token peek();
         Token advance();
         bool isAtEnd();

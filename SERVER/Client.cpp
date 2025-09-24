@@ -20,8 +20,6 @@ std::string &Client::getRequest()
     return _request;
 }
 
-
-
 const size_t &Client::getBytesSent() 
 {
     return _bytesSent;
@@ -39,9 +37,12 @@ void Client::setRequest(const std::string &request)
     _request = request;
 }
 
-
-
 void Client::setBytesSent(size_t sent)
 {
     _bytesSent = sent;
+}
+
+void Client::setResponse(const std::string &response)
+{
+    _response = response;
 }

@@ -86,6 +86,7 @@ void Webserv::deleteClient(SOCKET socket)
         delete it->second;
         _socketToClient.erase(it);
     }
+    std::cout << "Client disconnected on socket: " << socket << std::endl;
 }
 
 void Webserv::handleNewConnection(SOCKET socket)
@@ -105,6 +106,7 @@ void Webserv::handleNewConnection(SOCKET socket)
         close(clientSocket);
         return;
     }
+    std::cout << "New client connected on socket: " << clientSocket << std::endl;
     _socketToClient[clientSocket] = client;
     epoll_event event;
     event.data.fd = clientSocket;
@@ -117,9 +119,13 @@ void Webserv::handleNewConnection(SOCKET socket)
 }
 
 
-bool Webserv::parseRequest(Client &client)
+bool Webserv::parseRequest(Client &client) // parse the request and return true if the request is complete, you can implement it however you want, just make sure it returns the bool :3, its current body gha for testing purposes.
 {
     // enjoy the spaghetti :3
+    if (client.getRequest().empty())
+        return false;
+    else
+        return true;
     if (client.getRequest().find("\r\n\r\n") == std::string::npos)
         return false;
     return true;
@@ -127,27 +133,30 @@ bool Webserv::parseRequest(Client &client)
 
 void Webserv::sendResponse(Client &client)
 {
-    const std::string &response = client.getResponse();
+    const std::string &response = client.getRequest(); // should be getResponse() but let's use the request for now
     size_t responseSize = response.size();
     size_t bytesSent = client.getBytesSent();
     ssize_t result = send(client.getSocket(), response.c_str() + bytesSent, responseSize - bytesSent, 0);
     if (result > 0)
     {
+        std::cout << "Sent " << result << " bytes to socket: " << client.getSocket() << std::endl;
         client.setBytesSent(bytesSent + result);
         if (client.getBytesSent() == responseSize)
         {
             deleteClient(client.getSocket());
             return ;
         }
-    } else if (result == -1 && errno != EAGAIN && errno != EWOULDBLOCK )
+    } else if (result == -1 && (errno != EAGAIN || errno != EWOULDBLOCK) )
     {
+        std::cout << "Failed to send response to socket: " << client.getSocket() << std::endl;
         std::cerr << "send error: " << strerror(errno) << std::endl;
         deleteClient(client.getSocket());
         return ;
     }
+    std::cout << "Partial response sent to socket: " << client.getSocket() << ", waiting for next write event." << std::endl;
     epoll_event event;
     event.data.fd = client.getSocket();
-    event.events = EPOLLIN | EPOLLOUT;
+    event.events = EPOLLOUT;
     if (epoll_ctl(_epollFd, EPOLL_CTL_MOD, event.data.fd, &event) == -1)
     {
         std::cerr << "epoll_ctl failed: " << strerror(errno) << std::endl;
@@ -171,8 +180,11 @@ void Webserv::handleReadEvent(SOCKET socket)
     buffer[bytesRead] = '\0';
     if (bytesRead > 0)
     {
+        std::cout << "Read event on socket: " << socket << std::endl;
         client->getRequest().append(buffer, bytesRead);
+        std::cout << "Received " << bytesRead << " bytes: " << client->getRequest() << std::endl;
         bool requestReady = parseRequest(*client);
+        std::cout << "Request ready: " << (requestReady ? "true" : "false") << std::endl;
         if (requestReady)
             sendResponse(*client);
     } else if (bytesRead == 0)

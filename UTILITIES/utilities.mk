@@ -1,2 +1,4 @@
-SRCS += UTILITIES/split.cpp
-HEADERS += UTILITIES/split.hpp
+SRCS += UTILITIES/split.cpp \
+		UTILITIES/printServers.cpp
+HEADERS += UTILITIES/split.hpp \
+		UTILITIES/printServers.hpp
