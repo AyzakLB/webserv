@@ -6,12 +6,18 @@
 #include "SERVER/Webserv.hpp"
 
 #define DEFAULT_CONFIG_PATH "./TESTS/default_config_file.conf"
-
-std::string readConfigFile(const std::string& filename)
+bool checkExtension(const std::string &filename, const std::string extension)
 {
-    
+     return filename.compare(filename.length() - extension.length(), extension.length(), extension) == 0;
+}
+
+std::string openConfigFile(const std::string& filename)
+{   
+    if (checkExtension(filename, ".conf") == false)
+        throw std::runtime_error("wrong file extension, configuration files should have the extension '*.conf'");
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
+        perror("Error");
         throw std::runtime_error("Could not open file: " + filename);
     }
     std::stringstream buffer;
@@ -31,10 +37,8 @@ int main(int argc, char* argv[]) {
         std::cerr << "either provide a single configuration file, or run the program without any argument!" << std::endl;
         return 1;
     }
-
-    // Get the content from the stringstream
-    std::string source = readConfigFile(filename);
     try {
+        std::string source = openConfigFile(filename);
         Parser parser(source);
         std::vector<Server> servers  = parser.parse();
         // printServers(servers); 
@@ -44,7 +48,5 @@ int main(int argc, char* argv[]) {
         std::cerr << e.what() << std::endl;
         return 1;
     }
-    // file.close();
-
     return 0;
 }

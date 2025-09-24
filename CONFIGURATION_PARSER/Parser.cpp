@@ -11,12 +11,14 @@ std::vector<Server> Parser::parse()
     scanner.scanTokens();
     // scanner.printTokens();
     _tokens = scanner.getTokens();
-    while (_tokens[_current]._type != EOF_TOKEN && _current < _tokens.size() - 1)
+    while (_tokens[_current]._type != EOF_TOKEN ) // && _current < _tokens.size() - 1 check if you actually need this condition, you probably don't...
     {
         if (peek()._type == SERVER)
         {
             Server server;
             parseServerBlock(server);
+            if (server._foundListen == false)
+                throw ParsingException("at least ONE listen directive is required in your configuration file. Can't go to a house without an address now can we?");
             servers.push_back(server);
         }
         else
@@ -102,14 +104,16 @@ void Parser::parseLocation(Server &server)
 
 ///////////////////////////////////////////////////// SERVER DIRECTIVE PARSERS   ////////////////////////////////////////////////////////
 void Parser::parseListen(Server &server) 
-{
+{       
+        if (server._foundListen == false)
+            server._foundListen = true;
         consume(LISTEN, "expected a 'listen' directive");
         syntaxCheck(VALUE_STRING, "unexpected value for the address in listen");
         std::string address = advance()._lexeme;
         syntaxCheck(VALUE_NUMBER, "unexpected value for the port in listen");
         std::string port = advance()._lexeme;
 
-        server.addConnection(address, port, server);
+        server.addConnection(address, port);
         consume(SEMICOLON, "expected a ';' after listen directive");
 }
 

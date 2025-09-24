@@ -1,6 +1,7 @@
 #pragma once
 #include "SocketHeader.hpp"
 #include "../CONFIGURATION_PARSER/Server.hpp"
+#include "../CONFIGURATION_PARSER/Location.hpp"
 #include "Client.hpp"
 #include "../EXCEPTIONS/NetworkException.hpp"
 

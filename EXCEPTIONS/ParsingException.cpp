@@ -1,5 +1,7 @@
 #include "ParsingException.hpp"
 
+ParsingException::ParsingException(std::string errorMessage) : _message(errorMessage) {}
+
 ParsingException::ParsingException(Token token, std::string error)
 {
     std::ostringstream ss;
