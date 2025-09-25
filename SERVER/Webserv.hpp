@@ -1,7 +1,6 @@
 #pragma once
 #include "SocketHeader.hpp"
-#include "../CONFIGURATION_PARSER/Server.hpp"
-#include "../CONFIGURATION_PARSER/Location.hpp"
+#include "../CONFIGURATION_PARSER/Parser.hpp"
 #include "Client.hpp"
 #include "../EXCEPTIONS/NetworkException.hpp"
 
@@ -21,8 +20,8 @@ class Webserv {
         void eventLoop();
         void deleteClient(SOCKET socket);
         void handleNewConnection(SOCKET socket);
-        void handleReadEvent(SOCKET socket);
-        void handleWriteEvent(SOCKET socket);
+        void handleReadEvent(Client *client);
+        void handleWriteEvent(Client *client);
         void sendResponse(Client &client);
         bool parseRequest(Client &client);
 

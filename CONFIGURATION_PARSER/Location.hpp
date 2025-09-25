@@ -7,7 +7,7 @@
 #include <string>
 
 class Location {
-    std::string                         _path;
+    std::string                         _path; 
     std::map<std::string, std::string>  _error_page; // subject to change, https://nginx.org/en/docs/http/ngx_http_core_module.html#error_page
     size_t                              _client_max_body_size; // https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
     bool                                _allow_methods[3]; 

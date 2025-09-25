@@ -66,6 +66,7 @@ void Parser::parseDefaultLocation(Server &server)
         else
             throw ParsingException(peek(), "unexpected token in server blockkk");
 }
+
 void Parser::parseLocation(Server &server)
 {
     Location location;

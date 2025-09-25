@@ -118,7 +118,6 @@ void Webserv::handleNewConnection(SOCKET socket)
     }
 }
 
-
 bool Webserv::parseRequest(Client &client) // parse the request and return true if the request is complete, you can implement it however you want, just make sure it returns the bool :3, its current body gha for testing purposes.
 {
     // enjoy the spaghetti :3
@@ -130,7 +129,11 @@ bool Webserv::parseRequest(Client &client) // parse the request and return true 
         return false;
     return true;
 }
-
+void generateResponse(Client &client) // Ayoub's function to generate a response based on the request, the request data structure might be part of the client? up to you to decide
+{
+    (void) client;
+    return ;
+} 
 void Webserv::sendResponse(Client &client)
 {
     const std::string &response = client.getRequest(); // should be getResponse() but let's use the request for now
@@ -165,26 +168,18 @@ void Webserv::sendResponse(Client &client)
     }
 }
 
-void Webserv::handleReadEvent(SOCKET socket)
+void Webserv::handleReadEvent(Client *client)
 {
-    std::map<SOCKET, Client*>::iterator it = _socketToClient.find(socket);
-    if (it == _socketToClient.end())
-    {
-        std::cerr << "Client not found for socket: " << socket << std::endl;
-        close(socket);
-        return;
-    }
-    Client *client = _socketToClient[socket];
+    SOCKET socket = client->getSocket();
     char buffer[MAX_READ_SIZE];
     int bytesRead = recv(socket, buffer, sizeof(buffer) - 1, 0);
     buffer[bytesRead] = '\0';
     if (bytesRead > 0)
     {
-        std::cout << "Read event on socket: " << socket << std::endl;
         client->getRequest().append(buffer, bytesRead);
         std::cout << "Received " << bytesRead << " bytes: " << client->getRequest() << std::endl;
         bool requestReady = parseRequest(*client);
-        std::cout << "Request ready: " << (requestReady ? "true" : "false") << std::endl;
+        generateResponse(*client); // Ayoub's function to generate a response based on the request, the request data structure might be part of the client? up to you to decide
         if (requestReady)
             sendResponse(*client);
     } else if (bytesRead == 0)
@@ -199,18 +194,6 @@ void Webserv::handleReadEvent(SOCKET socket)
     }
 }
 
-void Webserv::handleWriteEvent(SOCKET socket)
-{
-    std::map<SOCKET, Client*>::iterator it = _socketToClient.find(socket);
-    if (it == _socketToClient.end())
-    {
-        std::cerr << "Client not found for socket: " << socket << std::endl;
-        close(socket);
-        return;
-    }
-    Client *client = _socketToClient[socket];
-    sendResponse(*client);
-}
 void Webserv::eventLoop()
 {
     while (true)
@@ -225,10 +208,14 @@ void Webserv::eventLoop()
                 handleNewConnection(eventSocket);
             else
             {
+                std::map<SOCKET, Client*>::iterator it = _socketToClient.find(eventSocket);
+                if (it == _socketToClient.end())
+                    continue; // normally this shouldn't happen
+                Client *client = it->second;
                 if (_events[n].events & EPOLLIN)
-                    handleReadEvent(eventSocket);
+                    handleReadEvent(client);
                 else if (_events[n].events & EPOLLOUT)
-                    handleWriteEvent(eventSocket);
+                    sendResponse(*client);
             }
         }
     }

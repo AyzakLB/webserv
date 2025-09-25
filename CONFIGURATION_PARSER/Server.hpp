@@ -1,12 +1,7 @@
-#pragma once
 
-#include "Scanner.hpp"
-#include <set>
-#include <map>
-#include <vector>
-#include <string>
-#include "Location.hpp"
+#include "./Location.hpp"
 class Server;
+
 class Connection {
     std::string _address;
     std::string  _port;
@@ -16,8 +11,6 @@ class Connection {
         const std::string &getAddress() const { return _address;}
         const std::string &getPort() const { return _port;} 
 };
-
-
 
 class Server {
     std::vector<Connection>             _listen; // https://nginx.org/en/docs/http/ngx_http_core_module.html#listen
